@@ -58,36 +58,36 @@ type SvrInfo struct {
 	Rooms []*RoomInfo `json:"rooms"`
 }
 
-type CENTER_UPDATE_INFO_REQ struct {
+type CenterUpdateInfoReq struct {
 	ID     string  `json:"id"`
 	Passwd string  `json:"passwd"`
 	Info   SvrInfo `json:"info"`
 }
 
-type CENTER_UPDATE_INFO_RSP struct {
+type CenterUpdateInfoRsp struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 }
 
-func (s *SvrInfo) Valid() error {
+func (s *SvrInfo) Valid() (int, error) {
 	if !SvrTypes[s.Type] {
-		return fmt.Errorf("invalid server type '%v'", s.Type)
+		return ERR_CENTER_INVALID_SVR_TYPE, fmt.Errorf("%v '%v'", ERR_CENTER_INVALID_SVR_TYPE_TXT, s.Type)
 	}
 
 	if s.Port == "" {
-		return fmt.Errorf("invalid server port '%v'", s.Port)
+		return ERR_CENTER_INVALID_SVR_PORT, fmt.Errorf("%v '%v'", ERR_CENTER_INVALID_SVR_PORT_TXT, s.Port)
 	}
 	if _, err := strconv.ParseUint(s.Port, 10, 0); err != nil {
-		return fmt.Errorf("invalid server port '%v'", s.Port)
+		return ERR_CENTER_INVALID_SVR_PORT, fmt.Errorf("%v '%v'", ERR_CENTER_INVALID_SVR_PORT_TXT, s.Port)
 	}
 
 	for _, room := range s.Rooms {
 		if room != nil {
 			if !GameTypes[room.GameType] {
-				return fmt.Errorf("invalid room game type '%v'", room.GameType)
+				return ERR_CENTER_INVALID_GAME_TYPE, fmt.Errorf("%v '%v'", ERR_CENTER_INVALID_GAME_TYPE_TXT, room.GameType)
 			}
 		}
 	}
 
-	return nil
+	return 0, nil
 }
